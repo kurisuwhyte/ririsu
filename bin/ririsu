@@ -33,18 +33,21 @@
 main(["help"]) -> usage();
 main(["version"]) -> io:format("ririsu 0.1.0");
 
+main(["eval", Expression]) ->
+    execute(Expression);
+
 main([Filename]) ->
     {ok, Data} = file:read_file(Filename),
-    execute(unicode:characters_to_list(Data));
-
-main([]) ->
-    execute(slurp(standard_io)).
-
+    execute(unicode:characters_to_list(Data)).
 
 execute(Source) ->
     Dir = filename:dirname(escript:script_name()),
     true = code:add_pathz(Dir ++ "/../beam"),
-    show(ririsu:run(Source)).
+    Stack = lists:flatmap(fun(X) ->
+                                  if X == $\n -> [];
+                                     true     -> [[X]]
+                                  end end, slurp(standard_io)),
+    show(ririsu:run(Source, {0, dict:new(), [Stack]})).
 
 show(Term) ->
     io:format("~p", [Term]).
@@ -68,4 +71,9 @@ usage() ->
          ++ "Usage:                                                   \n"
          ++ "  ririsu help                                            \n"
          ++ "  ririsu version                                         \n"
-         ++ "  ririsu <file.ri>                                       \n").
+         ++ "  ririsu <file.ri>                                       \n"
+         ++ "  ririsu eval <expression>                               \n"
+         ++ "                                                         \n"
+         ++ "The program uses the standard input as the initial stack \n"
+         ++ "for the script, and outputs the remaining stack after    \n"
+         ++ "evaluating all the expressions.                          \n").
