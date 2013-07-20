@@ -26,7 +26,7 @@
 %% ---------------------------------------------------------------------
 
 -module(ririsu).
--export([run/1, run/2]).
+-export([run/1, run/2, unfold/2]).
 
 %% =====================================================================
 %% Public API
@@ -61,6 +61,19 @@ do_in_environment(Source, Initial) ->
 %%
 mod(A, B) -> (A rem B + B) rem B.
 
+%%
+%% Constructs a list by applying F to the previous result.
+%%
+unfold(Fun, A) ->
+    unfold(Fun, A, []).
+
+unfold(Fun, A, Xs) ->
+    case Fun(A) of
+        stop    -> Xs;
+        {ok, X} -> [X | Xs] ++ unfold(Fun, X, Xs)
+    end.
+
+
 %% =====================================================================
 %% Primitive operations
 %% =====================================================================
@@ -91,7 +104,8 @@ evaluate("@", {0, Env, [Name, Code|Tail]}) ->
 
 %%% Evaluate A
 evaluate("$", {0, Env, [Source|Stack]}) ->
-    do_in_environment(Source, {0, Env, Stack});
+    F = lists:reverse(lists:flatten(Source)),
+    do_in_environment(F, {0, Env, Stack});
 
 %%% Plus A B
 evaluate("+", {0, Env, [A, B|Stack]}) ->
@@ -138,8 +152,10 @@ evaluate("f", {0, Env, Stack}) -> {0, Env, [false | Stack]};
 
 %%% Either A B
 evaluate("?", {0, Env, [A, B, C | Stack]}) ->
-    if A    -> do_in_environment(B, {0, Env, Stack});
-       true -> do_in_environment(C, {0, Env, Stack})
+    BF = lists:reverse(lists:flatten(B)),
+    CF = lists:reverse(lists:flatten(C)),
+    if A    -> do_in_environment(BF, {0, Env, Stack});
+       true -> do_in_environment(CF, {0, Env, Stack})
     end;
 
 %%% Map F A
@@ -170,6 +186,17 @@ evaluate(".", {0, Env, [F, Y, Xs | Stack]}) ->
                       , Y, Xs),
     {0, Env, [Res | Stack]};
         
+
+%%% Unfold F A
+evaluate(",", {0, Env, [F, A | Stack]}) ->
+    G   = lists:reverse(lists:flatten(F)),
+    Res = unfold(fun(X) ->
+                         [Head|_] = run(G, {0, Env, [X|Stack]}),
+                         if Head == false -> stop;
+                            true          -> {ok, Head}
+                         end
+                 end, A),
+    {0, Env, [Res | Stack]};
 
 %%% Quote
 evaluate("[", {Mode, Env, Stack}) ->

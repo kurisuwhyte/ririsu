@@ -18,7 +18,7 @@ A program to return all even numbers of a sequence:
     
 A program to sum all numbers of a sequence:
 
-    [+]\
+    [+].
 
 
 ## Running
@@ -50,6 +50,7 @@ Ririsu is a stack-based language with one-character operators:
     = [A B | _] -> [C | _]                      Structural equality
     > [A B | _] -> [C | _]                      True if A > B
     ! [A | _] -> [not A | _]                    Logical negation
+    f                                           The constant false.
 
 ### Arithmetic
                                                 
@@ -71,8 +72,9 @@ Ririsu is a stack-based language with one-character operators:
 ### Folding
     
     | [[F:A>B] [A] | _] -> [B | _]              Maps A over F
-    \ [[F:A B>C] A [B] | _] -> [C | _]          Folds B using F starting from A
     # [[F:A>B] [A] | _] -> [[A] | _]            Filters A using F
+    . [[F:A B>C] A [B] | _] -> [C | _]          Folds B using F starting from A
+    , [[F:A>B] C | _] -> [[B] | _]              Unfolds a list until false.
 
 ### Others
 
