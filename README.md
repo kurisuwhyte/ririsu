@@ -21,9 +21,12 @@ A program to sum all numbers of a sequence:
     [+]\
 
 
-## Installing
+## Running
 
-( ... )
+    $ make
+    $ echo "[dlrow olleh]" | ./bin/ririsu
+    # [["h", "e", "l", "l", "o", " ", "w", "o", "r", "l", "d"]]
+
 
 ## The Language
 
