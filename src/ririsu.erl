@@ -133,6 +133,9 @@ evaluate(">", {0, Env, [A, B|Stack]}) ->
 evaluate("!", {0, Env, [A|Stack]}) ->
     {0, Env, [not(A) | Stack]};
 
+%%% False
+evaluate("f", {0, Env, Stack}) -> {0, Env, [false | Stack]};
+
 %%% Either A B
 evaluate("?", {0, Env, [A, B, C | Stack]}) ->
     if A    -> do_in_environment(B, {0, Env, Stack});
