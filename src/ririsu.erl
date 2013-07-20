@@ -26,7 +26,7 @@
 %% ---------------------------------------------------------------------
 
 -module(ririsu).
--export([run/1, run/2, unfold/2]).
+-export([run/1, run/2]).
 
 %% =====================================================================
 %% Public API
@@ -74,11 +74,18 @@ unfold(Fun, A, Xs) ->
     end.
 
 
+%%
+%% Normalises a stack for execution as code.
+%%
+normalise_stack(Xs) ->
+    lists:reverse(lists:flatten(Xs)).
+
+
 %% =====================================================================
 %% Primitive operations
 %% =====================================================================
 
-%%% Newline is ignored
+%%% Ignore newlines
 evaluate("\n", {Mode, Env, Stack}) -> {Mode, Env, Stack};
 
 %%% Duplicate A
@@ -99,13 +106,11 @@ evaluate(" ", {0, Env, [_|Tail]}) ->
 %%% Define A B
 %%% :: A, [Dict, [B C | D]] -> [Dict{B => C}, D]
 evaluate("@", {0, Env, [Name, Code|Tail]}) ->
-    F = lists:reverse(lists:flatten(Code)),
-    {0, dict:store(Name, F, Env), Tail};
+    {0, dict:store(Name, normalise_stack(Code), Env), Tail};
 
 %%% Evaluate A
 evaluate("$", {0, Env, [Source|Stack]}) ->
-    F = lists:reverse(lists:flatten(Source)),
-    do_in_environment(F, {0, Env, Stack});
+    do_in_environment(normalise_stack(Source), {0, Env, Stack});
 
 %%% Plus A B
 evaluate("+", {0, Env, [A, B|Stack]}) ->
@@ -160,22 +165,20 @@ evaluate("f", {0, Env, Stack}) -> {0, Env, [false | Stack]};
 
 %%% Either A B
 evaluate("?", {0, Env, [A, B, C | Stack]}) ->
-    BF = lists:reverse(lists:flatten(B)),
-    CF = lists:reverse(lists:flatten(C)),
-    if A    -> do_in_environment(BF, {0, Env, Stack});
-       true -> do_in_environment(CF, {0, Env, Stack})
+    if A    -> do_in_environment(normalise_stack(B), {0, Env, Stack});
+       true -> do_in_environment(normalise_stack(C), {0, Env, Stack})
     end;
 
 %%% Map F A
 evaluate("|", {0, Env, [F, Xs | Stack]}) ->
-    G   = lists:reverse(lists:flatten(F)),
+    G   = normalise_stack(F)
     Res = lists:map(fun(X) -> run(G, {0, Env, [X | Stack]}) end
                     , Xs),
     {0, Env, [Res | Stack]};
 
 %%% Filter F A
 evaluate("#", {0, Env, [F, Xs | Stack]}) ->
-    G   = lists:reverse(lists:flatten(F)),
+    G   = normalise_stack(F),
     Res = lists:filter(fun(X) -> 
                                [A|_] = run(G, {0, Env, [X | Stack]}),
                                A
@@ -195,7 +198,7 @@ evaluate("r", {0, Env, [Xs | Stack]}) ->
 
 %%% Reduce F Y X
 evaluate(".", {0, Env, [F, Y, Xs | Stack]}) ->
-    G   = lists:reverse(lists:flatten(F)),
+    G   = normalise_stack(F),
     Res = lists:foldr(fun(A,B) ->
                               [Head|_] = run(G , {0, Env, [A,B|Stack]}),
                               Head
@@ -206,7 +209,7 @@ evaluate(".", {0, Env, [F, Y, Xs | Stack]}) ->
 
 %%% Unfold F A
 evaluate(",", {0, Env, [F, A | Stack]}) ->
-    G   = lists:reverse(lists:flatten(F)),
+    G   = normalise_stack(F),
     Res = unfold(fun(X) ->
                          [Head|_] = run(G, {0, Env, [X|Stack]}),
                          if Head == false -> stop;
