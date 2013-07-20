@@ -67,6 +67,9 @@ mod(A, B) -> (A rem B + B) rem B.
 %% Primitive operations
 %% =====================================================================
 
+%%% Newline is ignored
+evaluate("\n", {Mode, Env, Stack}) -> {Mode, Env, Stack};
+
 %%% Duplicate A
 %%% :: A, [Dict, [B | C]] -> [Dict, [B B | C]]
 evaluate("^", {0, Env, [A|Tail]}) ->
