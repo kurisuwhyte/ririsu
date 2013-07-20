@@ -43,7 +43,7 @@ main([]) ->
 
 execute(Source) ->
     Dir = filename:dirname(escript:script_name()),
-    true = code:add_pathz(Dir ++ "/../src"),
+    true = code:add_pathz(Dir ++ "/../beam"),
     show(ririsu:run(without_newlines(Source))).
 
 without_newlines(Text) ->
