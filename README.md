@@ -32,10 +32,11 @@ support, so you can feel like you're programming in APL but not really.
 
 ### Basic operators
 
-    0 .. 9                      Pushes this number onto the stack
     ^                   x       Duplicates the top of the stack
     !                   x y     Swaps the head and second items of the stack
     @                   n c     Defines a new operator with [n]ame for [c]ode
+    ~                   x       Evaluates X
+                        x       Drops x
     +                   x y     arithmetic plus
     -                   x y     arithmetic minus
     /                   x y     arithmetic division
@@ -45,11 +46,12 @@ support, so you can feel like you're programming in APL but not really.
     ¬                   x       logical not
     ∨                   x y     logical or
     ∧                   x y     logical and
-    ~                   x f     Maps x over f
-    \                   x y f   Reduces x with f starting from y (foldr)
-    #                   x f     Filters x with f
+    |                   f x     Maps x over f
+    \                   f y x   Reduces x with f starting from y (foldr)
+    #                   f x     Filters x with f
     [                           Begin quoting
     ]                           End quoting
+    (anything else)             Gets pushed onto the stack
 
 
 
