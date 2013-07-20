@@ -26,7 +26,7 @@
 %% ---------------------------------------------------------------------
 
 -module(ririsu).
--export([run/1]).
+-export([run/1, run/2]).
 
 %% =====================================================================
 %% Public API
@@ -36,9 +36,13 @@
 %% Evaluates a Ririsu program.
 %%
 %% :: [A] -> [B]
-run(Source) -> 
-    {0, _, Res} = do_in_environment(Source, {0, dict:new(), []}),
+run(Source) ->
+    run(Source, {0, dict:new(), []}).
+
+run(Source, Initial) -> 
+    {0, _, Res} = do_in_environment(Source, Initial),
     Res.
+
 
 
 %% =====================================================================
@@ -51,12 +55,6 @@ run(Source) ->
 do_in_environment(Source, Initial) ->
     lists:foldl(fun(A, B) -> evaluate([A], B) end, Initial, Source).
 
-%%
-%% Evaluates a source in a given environment, returns the result.
-%%
-run_in_environment(Source, Initial) ->
-    {0, _, Res} = do_in_environment(Source, Initial),
-    Res.
 
 %%
 %% Modulo operation
@@ -144,9 +142,7 @@ evaluate("?", {0, Env, [A, B, C | Stack]}) ->
 %%% Map F A
 evaluate("|", {0, Env, [F, Xs | Stack]}) ->
     G   = lists:reverse(lists:flatten(F)),
-    Res = lists:map(fun(X) -> run_in_environment(G
-                                               , {0, Env, [X | Stack]})
-                    end
+    Res = lists:map(fun(X) -> run(G, {0, Env, [X | Stack]}) end
                     , Xs),
     {0, Env, [Res | Stack]};
 
@@ -154,8 +150,7 @@ evaluate("|", {0, Env, [F, Xs | Stack]}) ->
 evaluate("#", {0, Env, [F, Xs | Stack]}) ->
     G   = lists:reverse(lists:flatten(F)),
     Res = lists:filter(fun(X) -> 
-                               [A|_] = run_in_environment(G
-                                                          , {0, Env, [X | Stack]}),
+                               [A|_] = run(G, {0, Env, [X | Stack]}),
                                A
                        end
                        , Xs),
@@ -166,8 +161,7 @@ evaluate("#", {0, Env, [F, Xs | Stack]}) ->
 evaluate("\\", {0, Env, [F, Y, Xs | Stack]}) ->
     G   = lists:reverse(lists:flatten(F)),
     Res = lists:foldr(fun(A,B) ->
-                              [Head|_] = run_in_environment(G
-                                                            , {0, Env, [A,B|Stack]}),
+                              [Head|_] = run(G , {0, Env, [A,B|Stack]}),
                               Head
                       end
                       , Y, Xs),
