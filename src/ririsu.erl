@@ -161,7 +161,7 @@ evaluate("#", {0, Env, [F, Xs | Stack]}) ->
 
 
 %%% Reduce F Y X
-evaluate("\\", {0, Env, [F, Y, Xs | Stack]}) ->
+evaluate(".", {0, Env, [F, Y, Xs | Stack]}) ->
     G   = lists:reverse(lists:flatten(F)),
     Res = lists:foldr(fun(A,B) ->
                               [Head|_] = run(G , {0, Env, [A,B|Stack]}),
