@@ -44,11 +44,7 @@ main([]) ->
 execute(Source) ->
     Dir = filename:dirname(escript:script_name()),
     true = code:add_pathz(Dir ++ "/../beam"),
-    show(ririsu:run(without_newlines(Source))).
-
-without_newlines(Text) ->
-    string:strip(Text, both, $\n).
-
+    show(ririsu:run(Source)).
 
 show(Term) ->
     io:format("~p", [Term]).
