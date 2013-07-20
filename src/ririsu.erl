@@ -28,7 +28,6 @@
 -module(ririsu).
 -export([run/1]).
 
-
 %% =====================================================================
 %% Public API
 %% =====================================================================
@@ -50,9 +49,7 @@ run(Source) ->
 %% Evaluates a source in a given environment.
 %%
 do_in_environment(Source, Initial) ->
-    lists:foldl(fun(A, B) -> evaluate([A], B) end
-                , Initial
-                , Source).
+    lists:foldl(fun(A, B) -> evaluate([A], B) end, Initial, Source).
 
 %%
 %% Evaluates a source in a given environment, returns the result.
@@ -77,7 +74,7 @@ evaluate("^", {0, Env, [A|Tail]}) ->
 
 %%% Swap A B
 %%% :: A, [Dict, [B C | D]] -> [Dict, [C B | D]]
-evaluate("!", {0, Env, [A, B|Tail]}) ->
+evaluate("~", {0, Env, [A, B|Tail]}) ->
     {0, Env, [B, A|Tail]};
 
 %%% Drop A
@@ -88,10 +85,11 @@ evaluate(" ", {0, Env, [_|Tail]}) ->
 %%% Define A B
 %%% :: A, [Dict, [B C | D]] -> [Dict{B => C}, D]
 evaluate("@", {0, Env, [Name, Code|Tail]}) ->
-    {0, dict:store(Name, Code, Env), Tail};
+    F = lists:reverse(lists:flatten(Code)),
+    {0, dict:store(Name, F, Env), Tail};
 
 %%% Evaluate A
-evaluate("~", {0, Env, [Source|Stack]}) ->
+evaluate("$", {0, Env, [Source|Stack]}) ->
     do_in_environment(Source, {0, Env, Stack});
 
 %%% Plus A B
@@ -118,21 +116,27 @@ evaluate("%", {0, Env, [A,B|Stack]}) ->
 evaluate(":", {0, Env, [A, B|Stack]}) ->
     {0, Env, [[A | B] | Stack]};
 
+%%% Concat A B
+evaluate("&", {0, Env, [A, B|Stack]}) ->
+    {0, Env, [A ++ B | Stack]};
+
 %%% Equal A B
 evaluate("=", {0, Env, [A, B|Stack]}) ->
     {0, Env, [A == B | Stack]};
 
+%%% Greater A B
+evaluate(">", {0, Env, [A, B|Stack]}) ->
+    {0, Env, [A > B | Stack]};
+
 %%% Not A
-evaluate("¬", {0, Env, [A|Stack]}) ->
+evaluate("!", {0, Env, [A|Stack]}) ->
     {0, Env, [not(A) | Stack]};
 
-%%% Or A B
-evaluate("∨", {0, Env, [A, B | Stack]}) ->
-    {0, Env, [A or B | Stack]};
-
-%%% And A B
-evaluate("∧", {0, Env, [A, B | Stack]}) ->
-    {0, Env, [A and B | Stack]};
+%%% Either A B
+evaluate("?", {0, Env, [A, B, C | Stack]}) ->
+    if A    -> do_in_environment(B, {0, Env, Stack});
+       true -> do_in_environment(C, {0, Env, Stack})
+    end;
 
 %%% Map F A
 evaluate("|", {0, Env, [F, Xs | Stack]}) ->
