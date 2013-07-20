@@ -141,7 +141,15 @@ evaluate("=", {0, Env, [A, B|Stack]}) ->
 
 %%% Greater A B
 evaluate(">", {0, Env, [A, B|Stack]}) ->
-    {0, Env, [A > B | Stack]};
+    {0, Env, [list_to_integer(A) > list_to_integer(B) | Stack]};
+
+%%% Sqrt A
+evaluate("s", {0, Env, [A | Stack]}) ->
+    {0, Env, [math:sqrt(list_to_integer(A)) | Stack]};
+
+%%% Round A
+evaluate("o", {0, Env, [A | Stack]}) ->
+    {0, Env, [erlang:round(A) | Stack]};
 
 %%% Not A
 evaluate("!", {0, Env, [A|Stack]}) ->
@@ -174,6 +182,15 @@ evaluate("#", {0, Env, [F, Xs | Stack]}) ->
                        end
                        , Xs),
     {0, Env, [Res | Stack]};
+
+
+%%% Flatten X
+evaluate("v", {0, Env, [Xs | Stack]}) ->
+    {0, Env, [lists:flatten(Xs) | Stack]};
+
+%%% Revert X
+evaluate("r", {0, Env, [Xs | Stack]}) ->
+    {0, Env, [lists:reverse(Xs) | Stack]};
 
 
 %%% Reduce F Y X
