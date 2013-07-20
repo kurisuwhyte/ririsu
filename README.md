@@ -14,7 +14,7 @@ A quine:
 
 A program to return all even numbers of a sequence:
 
-    [2%0=]#
+    [2~%0=]#
     
 A program to sum all numbers of a sequence:
 
