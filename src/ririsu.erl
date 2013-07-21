@@ -171,7 +171,7 @@ evaluate("?", {0, Env, [A, B, C | Stack]}) ->
 
 %%% Map F A
 evaluate("|", {0, Env, [F, Xs | Stack]}) ->
-    G   = normalise_stack(F)
+    G   = normalise_stack(F),
     Res = lists:map(fun(X) -> run(G, {0, Env, [X | Stack]}) end
                     , Xs),
     {0, Env, [Res | Stack]};
