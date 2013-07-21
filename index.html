@@ -28,106 +28,37 @@
         </ul>
       </header>
       <section>
-        <p>Ririsu is a small concatenative esolang that's perfect for code-golfs. It's even less readable than PERL!</p>
+        <h1>
+<a name="ririsu" class="anchor" href="#ririsu"><span class="octicon octicon-link"></span></a>Ririsu</h1>
 
-<p>For example, here's how you could solve the <a href="http://rosettacode.org/wiki/100_doors">100 Doors problem</a>:</p>
-
-<div class="highlight"><pre>[1+[^[f]~[1~-]~2&gt;!?],r]p@[001]vp[s^o=]|
-</pre></div>
-
-<h2>
-<a name="installing" class="anchor" href="#installing"><span class="octicon octicon-link"></span></a>Installing</h2>
-
-<p>Ririsu is implemented in <a href="http://www.erlang.org/">Erlang</a>, so you'll need that to run anything. Once you've got that sorted out, just clone the repository:</p>
-
-<div class="highlight"><pre><span class="nv">$ </span>git clone git://github.com/kurisuwhyte/ririsu
-<span class="nv">$ </span><span class="nb">cd </span>ririsu
-<span class="nv">$ </span>make
-</pre></div>
-
-<p>Now, just run <code>bin/ririsu repl</code> to get thrown in a delicious Read-Eval-Print-Loop.</p>
+<p>A pure, untyped, parallel, distributed, stack-based, dynamically-scoped
+data-processing esolang.</p>
 
 <h2>
-<a name="warming-up" class="anchor" href="#warming-up"><span class="octicon octicon-link"></span></a>Warming up</h2>
+<a name="example" class="anchor" href="#example"><span class="octicon octicon-link"></span></a>Example</h2>
 
-<p>So, now that you have a REPL we can try running some code. First, Ririsu is a concatenative language, this means that everything works on top of a stack. Some commands will push data on the stack, and some will use the top values of the stack to do computation, and push the result back on the stack.</p>
+<p>A program to return all even numbers of a sequence:</p>
 
-<p>For example, addition would work like this:</p>
+<pre><code>[123456789][2~%0=]#
+</code></pre>
 
-<div class="highlight"><pre>ririsu&gt; 12+
-<span class="o">[</span><span class="s2">"3"</span><span class="o">]</span>
-</pre></div>
+<p>A program to sum all numbers of a sequence:</p>
 
-<p>The previous operation is evaluated as follows:</p>
-
-<div class="highlight"><pre>We start with an empty stack: []
-"1" gets pushed on the stack: ["1"]
-"2" gets pushed on the stack: ["2", "1"]
-"+" operates on the top two values, and pushes the result back: "2" + "1" =&gt; ["3"]
-</pre></div>
-
-<blockquote>
-<p><strong>Note:</strong> Ririsu is untyped, so you can shoot yourself in the foot without realising you're shooting yourself in the foot, yay!</p>
-</blockquote>
+<pre><code>[123456789][+].
+</code></pre>
 
 <h2>
-<a name="down-the-rabbit-hole" class="anchor" href="#down-the-rabbit-hole"><span class="octicon octicon-link"></span></a>Down the rabbit hole</h2>
+<a name="running" class="anchor" href="#running"><span class="octicon octicon-link"></span></a>Running</h2>
 
-<p>Okay, if you ever heard about <a href="http://en.wikipedia.org/wiki/Reverse_Polish_notation">RPN</a> that was no biggie. So let's get to the interesting stuff. In Ririsu you can use code as data, and data as code. The stack is always what you use to pass arguments to functions, and these arguments can be code (yes, yes, Higher-Order functions and all that).</p>
-
-<p>To treat code as data, you have to "Quote" it, so that it won't be executed just yet:</p>
-
-<div class="highlight"><pre>ririsu&gt; [12+]
-[["1", "2", "+"]]
-</pre></div>
-
-<p>We can execute any list using the operation <code>$</code>:</p>
-
-<div class="highlight"><pre>ririsu&gt; $
-["3"]
-</pre></div>
-
-<p>Now things start getting interesting, since you can pass code around, and you can evaluate it, it means we can do Higher-Order functions! Some of them are already core-coded for your convenience, like Map:</p>
-
-<div class="highlight"><pre>ririsu&gt; [123456]
-[["1","2","3","4","5","6"], ["3"]]
-ririsu&gt; [1+]|
-[["2","3","4","5","6","7"], ["3"]]
-</pre></div>
+<pre><code>$ git clone git://github.com/kurisuwhyte/ririsu
+$ cd ririsu &amp;&amp; make
+$ ./bin/ririsu repl
+</code></pre>
 
 <h2>
-<a name="manipulate-the-stack-they-said-itll-be-fun-they-said" class="anchor" href="#manipulate-the-stack-they-said-itll-be-fun-they-said"><span class="octicon octicon-link"></span></a>Manipulate the stack, they said. It'll be fun, they said...</h2>
+<a name="licence" class="anchor" href="#licence"><span class="octicon octicon-link"></span></a>Licence</h2>
 
-<p>Sometimes you'll need to manipulate the stack so that the operation you're applying gets arguments in the correct order. Operations are really just functions that take in a Stack and return a new Stack — in Ririsu, though, you also get <strong>dynamic scoping</strong>, since functions also take an environment.</p>
-
-<p>Suppose you want to check if the square root of a value is an exact number. You could do it by cloning items on the stack:</p>
-
-<div class="highlight"><pre>ririsu&gt; 5s
-[2.23606797749979]
-ririsu&gt; ^
-[2.23606797749979,2.23606797749979]
-ririsu&gt; o
-[2,2.23606797749979]
-ririsu&gt; =
-[false]
-</pre></div>
-
-<p>Or you can use the dynamic scoping madness:</p>
-
-<div class="highlight"><pre>ririsu&gt; 5sA@
-[]  # just stored `5s` in `A`
-ririsu&gt; AAo=
-[false]
-</pre></div>
-
-<blockquote>
-<p><strong>Note:</strong> Sadly, Erlang doesn't support unicode :(</p>
-</blockquote>
-
-<h2>
-<a name="what-else" class="anchor" href="#what-else"><span class="octicon octicon-link"></span></a>What else?</h2>
-
-<p>The whole documentation for the language can be found in the seat pocket in front of you... I mean, in the <code>docs/</code> directory. There's also a handful of <code>examples/</code> laying around. The <a href="http://concatenative.org/wiki/view/Front%20Page">Concatenative Wiki</a> is an amazing place to learn more about concatenative programming in general :)</p>
+<p>WTFPL.</p>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/kurisuwhyte">kurisuwhyte</a></p>
