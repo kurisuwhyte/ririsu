@@ -26,7 +26,7 @@
 %% ---------------------------------------------------------------------
 
 -module(ririsu).
--export([run/1, run/2]).
+-export([run/1, run/2, do/2]).
 
 %% =====================================================================
 %% Public API
@@ -40,21 +40,20 @@ run(Source) ->
     run(Source, {0, dict:new(), []}).
 
 run(Source, Initial) -> 
-    {0, _, Res} = do_in_environment(Source, Initial),
+    {0, _, Res} = do(Source, Initial),
     Res.
+
+%%
+%% Evaluates a source in a given environment.
+%%
+do(Source, Initial) ->
+    lists:foldl(fun(A, B) -> evaluate([A], B) end, Initial, Source).
 
 
 
 %% =====================================================================
 %% Internal functions
 %% =====================================================================
-
-%%
-%% Evaluates a source in a given environment.
-%%
-do_in_environment(Source, Initial) ->
-    lists:foldl(fun(A, B) -> evaluate([A], B) end, Initial, Source).
-
 
 %%
 %% Modulo operation
@@ -110,7 +109,7 @@ evaluate("@", {0, Env, [Name, Code|Tail]}) ->
 
 %%% Evaluate A
 evaluate("$", {0, Env, [Source|Stack]}) ->
-    do_in_environment(normalise_stack(Source), {0, Env, Stack});
+    do(normalise_stack(Source), {0, Env, Stack});
 
 %%% Plus A B
 evaluate("+", {0, Env, [A, B|Stack]}) ->
@@ -165,8 +164,8 @@ evaluate("f", {0, Env, Stack}) -> {0, Env, [false | Stack]};
 
 %%% Either A B
 evaluate("?", {0, Env, [A, B, C | Stack]}) ->
-    if A    -> do_in_environment(normalise_stack(B), {0, Env, Stack});
-       true -> do_in_environment(normalise_stack(C), {0, Env, Stack})
+    if A    -> do(normalise_stack(B), {0, Env, Stack});
+       true -> do(normalise_stack(C), {0, Env, Stack})
     end;
 
 %%% Map F A
@@ -236,7 +235,7 @@ evaluate("]", {Mode, Env, Stack}) ->
 %%% :: A, [Dict{A => B}, C] -> [Dict, D]
 evaluate(Op, {0, Env, Stack}) ->
     case dict:find(Op, Env) of
-        {ok, Source} -> do_in_environment(Source, {0, Env, Stack});
+        {ok, Source} -> do(Source, {0, Env, Stack});
         error        -> {0, Env, [Op|Stack]}
     end;
 

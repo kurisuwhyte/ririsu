@@ -30,27 +30,36 @@
 %% =====================================================================
 %% CLI
 %% =====================================================================
-main(["help"]) -> usage();
-main(["version"]) -> io:format("ririsu 0.1.0");
+main(Args) ->
+    Dir = filename:dirname(escript:script_name()),
+    true = code:add_pathz(Dir ++ "/../beam"),
+    app(Args).
 
-main(["eval", Expression]) ->
+
+app(["help"]) -> usage();
+app(["version"]) -> io:format("ririsu 0.1.0");
+
+app(["eval", Expression]) ->
     execute(Expression);
 
-main([Filename]) ->
-    execute(read(Filename));
+app(["-", "eval", Expression]) ->
+    execute(Expression, [to_stack(slurp(standard_io))]);
 
-main(["-", Filename]) ->
+app(["repl"]) ->
+    io:format("Ririsu v0.1.0    (^C to exit)\n"),
+    repl();
+
+app(["-", Filename]) ->
     execute(read(Filename), [to_stack(slurp(standard_io))]);
 
-main(["-", "eval", Expression]) ->
-    execute(Expression, [to_stack(slurp(standard_io))]).
+app([Filename]) ->
+    execute(read(Filename)).
+
 
 execute(Source) ->
     execute(Source, []).
 
 execute(Source, Stack) ->
-    Dir = filename:dirname(escript:script_name()),
-    true = code:add_pathz(Dir ++ "/../beam"),
     show(ririsu:run(Source, {0, dict:new(), Stack})).
 
 read(Filename) ->
@@ -78,6 +87,15 @@ slurp(File) ->
             Buffer ++ slurp(File)
     end.
 
+repl() ->
+    repl({0, dict:new(), []}).
+
+repl(State) ->
+    Expression = io:get_line('ririsu> '),
+    {Mode, Env, Stack} = ririsu:do(Expression, State),
+    io:format("~p\n", [Stack]),
+    repl({Mode, Env, Stack}).
+
 
 usage() ->
     display("ririsu --- The 2^6th most horrible language ever devised.\n"
@@ -87,6 +105,7 @@ usage() ->
          ++ "  ririsu version                                         \n"
          ++ "  ririsu [-] <file.ri>                                   \n"
          ++ "  ririsu [-] eval <expression>                           \n"
+         ++ "  ririsu repl                                            \n"
          ++ "                                                         \n"
          ++ "The program uses the standard input as the initial stack \n"
          ++ "for the script, and outputs the remaining stack after    \n"
