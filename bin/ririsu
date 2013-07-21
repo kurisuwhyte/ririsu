@@ -53,8 +53,11 @@ app(["-", Filename]) ->
     execute(read(Filename), [to_stack(slurp(standard_io))]);
 
 app([Filename]) ->
-    execute(read(Filename)).
+    execute(read(Filename));
 
+app(_) ->
+    usage(),
+    halt(1).
 
 execute(Source) ->
     execute(Source, []).
