@@ -77,7 +77,7 @@ unfold(Fun, A, Xs) ->
 %% Normalises a stack for execution as code.
 %%
 normalise_stack(Xs) ->
-    lists:reverse(lists:flatten(Xs)).
+    lists:flatten(Xs).
 
 
 %% =====================================================================
@@ -171,7 +171,9 @@ evaluate("?", {0, Env, [A, B, C | Stack]}) ->
 %%% Map F A
 evaluate("|", {0, Env, [F, Xs | Stack]}) ->
     G   = normalise_stack(F),
-    Res = lists:map(fun(X) -> run(G, {0, Env, [X | Stack]}) end
+    Res = lists:map(fun(X) -> [H|_] = run(G, {0, Env, [X | Stack]}),
+                              H
+                    end
                     , Xs),
     {0, Env, [Res | Stack]};
 
@@ -227,7 +229,8 @@ evaluate("[", {Mode, Env, Stack}) ->
 %%% Unquote
 evaluate("]", {Mode, Env, Stack}) ->
     if Mode =:= 0 -> erlang:error(unquote_outside_data_mode);
-       Mode =:= 1 -> {Mode - 1, Env, Stack};
+       Mode =:= 1 -> [Head|Tail] = Stack,
+                     {Mode - 1, Env, [lists:reverse(Head) | Tail]};
        true       -> [Head|Tail] = Stack,
                      {Mode - 1, Env, [["]" | Head] | Tail]}
     end;
