@@ -121,7 +121,7 @@ evaluate("-", {0, Env, [A, B|Stack]}) ->
 
 %%% Divide A B
 evaluate("/", {0, Env, [A, B|Stack]}) ->
-    {0, Env, [integer_to_list(list_to_integer(A) / list_to_integer(B)) | Stack]};
+    {0, Env, [integer_to_list(erlang:round(list_to_integer(A) / list_to_integer(B))) | Stack]};
 
 %%% Multiply A B
 evaluate("*", {0, Env, [A, B|Stack]}) ->
@@ -149,11 +149,7 @@ evaluate(">", {0, Env, [A, B|Stack]}) ->
 
 %%% Sqrt A
 evaluate("s", {0, Env, [A | Stack]}) ->
-    {0, Env, [integer_to_list(math:sqrt(list_to_integer(A))) | Stack]};
-
-%%% Round A
-evaluate("o", {0, Env, [A | Stack]}) ->
-    {0, Env, [integer_to_list(erlang:round(list_to_integer(A))) | Stack]};
+    {0, Env, [integer_to_list(erlang:round(math:sqrt(list_to_integer(A)))) | Stack]};
 
 %%% Not A
 evaluate("!", {0, Env, [A|Stack]}) ->
