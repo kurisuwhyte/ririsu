@@ -37,7 +37,7 @@ main(Args) ->
 
 
 app(["help"]) -> usage();
-app(["version"]) -> io:format("ririsu 0.1.0");
+app(["version"]) -> io:format("ririsu 0.2.0");
 
 app(["eval", Expression]) ->
     execute(Expression);
@@ -46,7 +46,7 @@ app(["-", "eval", Expression]) ->
     execute(Expression, [to_stack(slurp(standard_io))]);
 
 app(["repl"]) ->
-    io:format("Ririsu v0.1.0    (^C to exit)\n"),
+    io:format("Ririsu v0.2.0    (^C to exit)\n"),
     repl();
 
 app(["-", Filename]) ->
