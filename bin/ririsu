@@ -67,7 +67,7 @@ execute(Source, Stack) ->
 
 read(Filename) ->
     {ok, Data} = file:read_file(Filename),
-    execute(unicode:characters_to_list(Data)).
+    unicode:characters_to_list(Data).
 
 to_stack(List) ->
     lists:flatmap(fun(X) ->
