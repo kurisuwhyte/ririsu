@@ -153,7 +153,7 @@ evaluate("s", {0, Env, [A | Stack]}) ->
 
 %%% Round A
 evaluate("o", {0, Env, [A | Stack]}) ->
-    {0, Env, [erlang:round(A) | Stack]};
+    {0, Env, [integer_to_list(erlang:round(list_to_integer(A))) | Stack]};
 
 %%% Not A
 evaluate("!", {0, Env, [A|Stack]}) ->
