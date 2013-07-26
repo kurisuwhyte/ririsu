@@ -151,6 +151,10 @@ evaluate(">", {0, Env, [A, B|Stack]}) ->
 evaluate("s", {0, Env, [A | Stack]}) ->
     {0, Env, [integer_to_list(erlang:round(math:sqrt(list_to_integer(A)))) | Stack]};
 
+%%% Power A B
+evaluate("e", {0, Env, [A, B | Stack]}) ->
+    {0, Env, [integer_to_list(erlang:round(math:pow(list_to_integer(A), list_to_integer(B)))) | Stack]};
+
 %%% Not A
 evaluate("!", {0, Env, [A|Stack]}) ->
     {0, Env, [not(A) | Stack]};
