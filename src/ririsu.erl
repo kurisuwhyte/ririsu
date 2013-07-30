@@ -47,7 +47,7 @@ run(Source, Initial) ->
 %% Evaluates a source in a given environment.
 %%
 do(Source, Initial) ->
-    lists:foldl(fun(A, B) -> evaluate([A], B) end, Initial, Source).
+    lists:foldl(fun evaluate/2, Initial, Source).
 
 
 
@@ -73,175 +73,144 @@ unfold(Fun, A, Xs) ->
     end.
 
 
-%%
-%% Normalises a stack for execution as code.
-%%
-normalise_stack(Xs) ->
-    lists:flatten(Xs).
-
-
 %% =====================================================================
 %% Primitive operations
 %% =====================================================================
 
-%%% Ignore newlines
-evaluate("\n", {Mode, Env, Stack}) -> {Mode, Env, Stack};
+evaluate($\n, {Mode, Env, Stack}) -> {Mode, Env, Stack};
 
-%%% Duplicate A
-%%% :: A, [Dict, [B | C]] -> [Dict, [B B | C]]
-evaluate("^", {0, Env, [A|Tail]}) ->
-    {0, Env, [A, A|Tail]};
 
-%%% Swap A B
-%%% :: A, [Dict, [B C | D]] -> [Dict, [C B | D]]
-evaluate("~", {0, Env, [A, B|Tail]}) ->
-    {0, Env, [B, A|Tail]};
+%% == Quoting / Unquoting ==============================================
+evaluate($[, {Mode, Env, Stack}) ->
+    if Mode =:= 0 -> {1, Env, [[] | Stack]};
+       true       -> [Head | Tail] = Stack,
+                     {Mode + 1, Env, [[$[ | Head ] | Tail]}
+    end;
 
-%%% Drop A
-%%% :: A, [Dict, [B | C]] -> [Dict, [C]]
-evaluate(" ", {0, Env, [_|Tail]}) ->
-    {0, Env, Tail};
+evaluate($], {Mode, Env, Stack}) ->
+    if Mode =:= 0 -> erlang:error(unquote_outside_data_mode);
+       Mode =:= 1 -> [Head | Tail] = Stack,
+                     {Mode - 1, Env, [lists:reverse(Head) | Tail]};
+       true       -> [Head | Tail] = Stack,
+                     {Mode - 1, Env, [[$] | Head] | Tail]}
+    end;
 
-%%% Define A B
-%%% :: A, [Dict, [B C | D]] -> [Dict{B => C}, D]
-evaluate("@", {0, Env, [Name, Code|Tail]}) ->
-    {0, dict:store(Name, normalise_stack(Code), Env), Tail};
 
-%%% Evaluate A
-evaluate("$", {0, Env, [Source|Stack]}) ->
-    do(normalise_stack(Source), {0, Env, Stack});
+%% == Stack manipulation ===============================================
+evaluate($^, {0, Env, [A | Stack]}) ->
+    {0, Env, [A, A | Stack]};
 
-%%% Plus A B
-evaluate("+", {0, Env, [A, B|Stack]}) ->
-    {0, Env, [integer_to_list(list_to_integer(A) + list_to_integer(B)) | Stack]};
+evaluate($~, {0, Env, [A, B | Stack]}) ->
+    {0, Env, [B, A | Stack]};
 
-%%% Minus A B
-evaluate("-", {0, Env, [A, B|Stack]}) ->
-    {0, Env, [integer_to_list(list_to_integer(A) - list_to_integer(B)) | Stack]};
+evaluate(32, {0, Env, [_ | Stack]}) ->
+    {0, Env, Stack};
 
-%%% Divide A B
-evaluate("/", {0, Env, [A, B|Stack]}) ->
-    {0, Env, [integer_to_list(erlang:round(list_to_integer(A) / list_to_integer(B))) | Stack]};
 
-%%% Multiply A B
-evaluate("*", {0, Env, [A, B|Stack]}) ->
-    {0, Env, [integer_to_list(list_to_integer(A) * list_to_integer(B)) | Stack]};
+%% == Bindings and dynamic evaluation ==================================
+evaluate($@, {0, Env, [Name, Code | Stack]}) ->
+    {0, dict:store(Name, Code, Env), Stack};
 
-%%% Modulo A B
-evaluate("%", {0, Env, [A,B|Stack]}) ->
-    {0, Env, [integer_to_list(mod(list_to_integer(A), list_to_integer(B))) | Stack]};
+evaluate($$, {0, Env, [Source | Stack]}) ->
+    do(Source, {0, Env, Stack});
 
-%%% Cons A B
-evaluate(":", {0, Env, [A, B|Stack]}) ->
-    {0, Env, [[A | B] | Stack]};
 
-%%% Concat A B
-evaluate("&", {0, Env, [A, B|Stack]}) ->
-    {0, Env, [A ++ B | Stack]};
+%% == Arithmetic =======================================================
+evaluate($+, {0, Env, [A, B | Stack]}) ->
+    {0, Env, [A + B | Stack]};
 
-%%% Equal A B
-evaluate("=", {0, Env, [A, B|Stack]}) ->
+evaluate($-, {0, Env, [A, B | Stack]}) ->
+    {0, Env, [A - B | Stack]};
+
+evaluate($/, {0, Env, [A, B | Stack]}) ->
+    {0, Env, [A / B | Stack]};
+
+evaluate($*, {0, Env, [A, B | Stack]}) ->
+    {0, Env, [A * B | Stack]};
+
+evaluate($%, {0, Env, [A, B | Stack]}) ->
+    {0, Env, [mod(A, B) | Stack]};
+
+evaluate($s, {0, Env, [A | Stack]}) ->
+    {0, Env, [math:sqrt(A) | Stack]};
+
+evaluate($o, {0, Env, [A | Stack]}) ->
+    {0, Env, [erlang:round(A) | Stack]};
+
+evaluate($i, {0, Env, [A | Stack]}) ->
+    {0, Env, [list_to_integer(A) | Stack]};
+
+
+%% == Logic ============================================================
+evaluate($=, {0, Env, [A, B | Stack]}) ->
     {0, Env, [A == B | Stack]};
 
-%%% Greater A B
-evaluate(">", {0, Env, [A, B|Stack]}) ->
-    {0, Env, [list_to_integer(A) > list_to_integer(B) | Stack]};
+evaluate($>, {0, Env, [A, B | Stack]}) ->
+    {0, Env, [A > B | Stack]};
 
-%%% Sqrt A
-evaluate("s", {0, Env, [A | Stack]}) ->
-    {0, Env, [integer_to_list(erlang:round(math:sqrt(list_to_integer(A)))) | Stack]};
-
-%%% Power A B
-evaluate("e", {0, Env, [A, B | Stack]}) ->
-    {0, Env, [integer_to_list(erlang:round(math:pow(list_to_integer(A), list_to_integer(B)))) | Stack]};
-
-%%% Not A
-evaluate("!", {0, Env, [A|Stack]}) ->
+evaluate($!, {0, Env, [A | Stack]}) ->
     {0, Env, [not(A) | Stack]};
 
-%%% False
-evaluate("f", {0, Env, Stack}) -> {0, Env, [false | Stack]};
+evaluate($f, {0, Env, Stack}) ->
+    {0, Env, [false | Stack]};
 
-%%% Either A B
-evaluate("?", {0, Env, [A, B, C | Stack]}) ->
-    if A    -> do(normalise_stack(B), {0, Env, Stack});
-       true -> do(normalise_stack(C), {0, Env, Stack})
+evaluate($?, {0, Env, [Test, Consequent, Alternate | Stack]}) ->
+    if Test -> do(Consequent, {0, Env, Stack});
+       true -> do(Alternate,  {0, Env, Stack})
     end;
 
-%%% Map F A
-evaluate("|", {0, Env, [F, Xs | Stack]}) ->
-    G   = normalise_stack(F),
-    Res = lists:map(fun(X) -> [H|_] = run(G, {0, Env, [X | Stack]}),
-                              H
-                    end
-                    , Xs),
-    {0, Env, [Res | Stack]};
+%% == Lists ============================================================
+evaluate($:, {0, Env, [A, B | Stack]}) ->
+    {0, Env, [[A | B] | Stack]};
 
-%%% Filter F A
-evaluate("#", {0, Env, [F, Xs | Stack]}) ->
-    G   = normalise_stack(F),
-    Res = lists:filter(fun(X) -> 
-                               [A|_] = run(G, {0, Env, [X | Stack]}),
-                               A
-                       end
-                       , Xs),
-    {0, Env, [Res | Stack]};
+evaluate($&, {0, Env, [A, B | Stack]}) ->
+    {0, Env, [A ++ B | Stack]};
 
-
-%%% Flatten X
-evaluate("v", {0, Env, [Xs | Stack]}) ->
-    {0, Env, [lists:flatten(Xs) | Stack]};
-
-%%% Revert X
-evaluate("r", {0, Env, [Xs | Stack]}) ->
+evaluate($r, {0, Env, [Xs | Stack]}) ->
     {0, Env, [lists:reverse(Xs) | Stack]};
 
+evaluate($v, {0, Env, [Xs | Stack]}) ->
+    {0, Env, [lists:flatten(Xs) | Stack]};
 
-%%% Reduce F Y X
-evaluate(".", {0, Env, [F, Y, Xs | Stack]}) ->
-    G   = normalise_stack(F),
-    Res = lists:foldr(fun(A,B) ->
-                              [Head|_] = run(G , {0, Env, [A,B|Stack]}),
-                              Head
-                      end
-                      , Y, Xs),
+evaluate($h, {0, Env, [[Head | Tail] | Stack]}) ->
+    {0, Env, [Head, Tail | Stack]};
+
+
+%% == Folds ============================================================
+evaluate($|, {0, Env, [F, Xs | Stack]}) ->
+    Res = lists:map(fun(X) -> [H | _] = run(F, {0, Env, [X | Stack]}),
+                              H
+                    end, Xs),
     {0, Env, [Res | Stack]};
-        
 
-%%% Unfold F A
-evaluate(",", {0, Env, [F, A | Stack]}) ->
-    G   = normalise_stack(F),
+evaluate($#, {0, Env, [F, Xs | Stack]}) ->
+    Res = lists:filter(fun(X) -> [H | _] = run(F, {0, Env, [X | Stack]}),
+                                 H
+                       end, Xs),
+    {0, Env, [Res | Stack]};
+
+evaluate($., {0, Env, [F, Initial, Xs | Stack]}) ->
+    Res = lists:foldr(fun(A, B) -> [H | _] = run(F, {0, Env, [A, B | Stack]}),
+                                   H
+                      end, Initial, Xs),
+    {0, Env, [Res | Stack]};
+
+evaluate($,, {0, Env, [F, Initial | Stack]}) ->
     Res = unfold(fun(X) ->
-                         [Head|_] = run(G, {0, Env, [X|Stack]}),
-                         if Head == false -> stop;
-                            true          -> {ok, Head}
+                         [H | _] = run(F, {0, Env, [X | Stack]}),
+                         if H == false -> stop;
+                            true       -> {ok, H}
                          end
-                 end, A),
+                 end, Initial),
     {0, Env, [Res | Stack]};
 
-%%% Quote
-evaluate("[", {Mode, Env, Stack}) ->
-    if Mode =:= 0 -> {1, Env, [[] | Stack]};
-       true       -> [Head|Tail] = Stack,
-                     {Mode + 1, Env, [["[" | Head] | Tail]}
-    end;
 
-%%% Unquote
-evaluate("]", {Mode, Env, Stack}) ->
-    if Mode =:= 0 -> erlang:error(unquote_outside_data_mode);
-       Mode =:= 1 -> [Head|Tail] = Stack,
-                     {Mode - 1, Env, [lists:reverse(Head) | Tail]};
-       true       -> [Head|Tail] = Stack,
-                     {Mode - 1, Env, [["]" | Head] | Tail]}
-    end;
-
-%%% :: A, [Dict{A => B}, C] -> [Dict, D]
+%% == Base cases =======================================================
 evaluate(Op, {0, Env, Stack}) ->
     case dict:find(Op, Env) of
         {ok, Source} -> do(Source, {0, Env, Stack});
-        error        -> {0, Env, [Op|Stack]}
+        error        -> {0, Env, [Op | Stack]}
     end;
 
-%%% :: A, [Dict, B] -> [Dict, [A | B]]
 evaluate(X, {N, Env, [As | Stack]}) when N > 0 ->
     {N, Env, [[X | As] | Stack]}.
