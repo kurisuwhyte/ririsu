@@ -9,11 +9,11 @@ data-processing esolang.
 
 A program to return all even numbers of a sequence:
 
-    [123456789][2~%0=]#
+    [123456789][li]|[[2]i~%[0]i=]#
     
 A program to sum all numbers of a sequence:
 
-    [123456789][+].
+    [123456789][li]|[+].
 
 
 ## Running
