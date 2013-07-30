@@ -95,6 +95,9 @@ evaluate($], {Mode, Env, Stack}) ->
                      {Mode - 1, Env, [[$] | Head] | Tail]}
     end;
 
+evaluate($q, {0, Env, [A | Stack]}) ->
+    {0, Env, ["[" ++ A ++ "]" | Stack]};
+
 
 %% == Stack manipulation ===============================================
 evaluate($^, {0, Env, [A | Stack]}) ->
@@ -137,8 +140,13 @@ evaluate($s, {0, Env, [A | Stack]}) ->
 evaluate($o, {0, Env, [A | Stack]}) ->
     {0, Env, [erlang:round(A) | Stack]};
 
+
+%% == Conversions ======================================================
 evaluate($i, {0, Env, [A | Stack]}) ->
     {0, Env, [list_to_integer(A) | Stack]};
+
+evaluate($a, {0, Env, [A | Stack]}) ->
+    {0, Env, [integer_to_list(A) | Stack]};
 
 
 %% == Logic ============================================================
