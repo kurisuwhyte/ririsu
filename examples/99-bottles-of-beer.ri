@@ -5,7 +5,7 @@
  Take one down and pass it around, no more bottles of beer on the wall.]
 
 [- Generates a range from 99~2 -] 
-[99]i[1]i+[^[f]~[[1]i~-]~[3]i>!?],
+[100]i[^[f]~[[1]i~-]~[3]i>!?],
 [alN@
 [ bottles of beer on the wall, ]N&
 [ bottles of beer. Take one down and pass it around, ]N&~&
