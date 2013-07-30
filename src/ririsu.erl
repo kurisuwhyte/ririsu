@@ -175,6 +175,9 @@ evaluate($v, {0, Env, [Xs | Stack]}) ->
 evaluate($h, {0, Env, [[Head | Tail] | Stack]}) ->
     {0, Env, [Head, Tail | Stack]};
 
+evaluate($l, {0, Env, [Head | Stack]}) ->
+    {0, Env, [[Head] | Stack]};
+
 
 %% == Folds ============================================================
 evaluate($|, {0, Env, [F, Xs | Stack]}) ->
