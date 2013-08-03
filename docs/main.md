@@ -181,6 +181,10 @@ amazing place to learn more about concatenative programming in general :)
 [Photo](http://www.flickr.com/photos/leradiateur/6093706876/) taken from
 Flickr, licensed under CC.
 
+This whole website is here thanks to [rstacruz](https://github.com/rstacruz/)'s
+amazing [Flatdoc](https://github.com/rstacruz/flatdoc). Seriously guys, you
+gotta check that out ;)
+
 
 ## Changelog
 
