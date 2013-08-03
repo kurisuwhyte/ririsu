@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width">
+
+  <title>Ririsu — The 2^6th most horrible language ever devised.</title>
+
+  <!-- Flatdoc -->
+  <script src="vendor/jquery.min.js"></script>
+  <script src="vendor/legacy.js"></script>
+  <script src="vendor/flatdoc.js"></script>
+
+  <!-- Flatdoc theme -->
+  <link href="vendor/theme-white.style.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+  <script src="vendor/theme-white.script.js"></script>
+
+  <!-- Meta -->
+  <meta content="Ririsu" property="og:title">
+  <meta name="description"
+        content="Ririsu is a small concatenative esolang that's perfect for
+                 code-golfs. It's even less readable than PERL!">
+
+  <!-- Initializer -->
+  <script>
+    Flatdoc.run({
+      fetcher: Flatdoc.file('docs/main.md')
+    });
+  </script>
+
+</head>
+<body role='flatdoc'>
+
+  <div class='title-area title-card'>
+    <img src='images/lilith.jpg' alt='' class='bg'>
+    <div class='in'>
+      <div class='headline'>
+        <h1>Ririsu</h1>
+        <p>An untyped concatenative language of bewitchingly sweetly
+        evulness</p>
+        <p><small>It's also less readable than Perl!</small></p>
+      </div>
+    </div>
+  </div>
+
+  <div class='header'>
+    <div class='left'>
+      <h1><a href='/'>Ririsu</a></h1>
+      <ul>
+        <li><a href='https://github.com/kurisuwhyte/ririsu'>View on GitHub</a></li>
+        <li><a href='https://github.com/kurisuwhyte/ririsu/issues'>Issues</a></li>
+        <li><a href='/reference.html'>API Reference</a></li>
+      </ul>
+    </div>
+    <div class='right'>
+      <!-- GitHub buttons: see http://ghbtns.com -->
+      <iframe src="http://ghbtns.com/github-btn.html?user=kurisuwhyte&amp;repo=ririsu&amp;type=watch&amp;count=true" allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
+    </div>
+  </div>
+
+  <div class='content-root'>
+    <div class='menubar'>
+      <div class='menu section' role='flatdoc-menu'></div>
+    </div>
+    <div role='flatdoc-content' class='content'></div>
+  </div>
+
+</body>
+</html>
