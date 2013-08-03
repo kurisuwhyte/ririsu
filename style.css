@@ -1,0 +1,42 @@
+body {
+  font-size: 16px;
+  font-family: Lato, arial, sans;
+}
+.title-card {
+  width: 100%;
+  display: table;
+  background: #000;
+}
+.title-card img {
+  opacity: 0.4;
+}
+.title-card > .in {
+  display: table-cell;
+  vertical-align: middle;
+}
+.title-card .headline {
+  display: inline-block;
+  vertical-align: middle;
+  max-width: 800px;
+  padding: 0 50px;
+  text-shadow: 0px 0px 1px rgba(0,0,0,0.4);
+}
+.title-card .headline h1 {
+  color: #fff;
+  font-size: 156px;
+  font-family: Lato, arial, sans;
+  font-weight: 100;
+  line-height: 110%;
+}
+.title-card .headline p {
+  color: #fff;
+  font-family: Lato, arial, sans;
+  font-size: 20px;
+  font-style: italic;
+  font-weight: 400;
+}
+.title-card .headline small {
+  font-size: 0.8em;
+  font-weight: 300;
+  font-style: normal;
+}
