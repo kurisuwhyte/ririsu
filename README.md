@@ -25,7 +25,8 @@ A program to sum all numbers of a sequence:
 
 ## Documentation
 
-Just head over to the [wiki](https://github.com/kurisuwhyte/ririsu/wiki).
+Check it out on-line at http://kurisuwhyte.github.io/ririsu, or download the
+gh-pages branch and open the `index.html` file.
 
 
 ## Tests
