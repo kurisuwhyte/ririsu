@@ -1,5 +1,5 @@
 
-# Ririsu
+# The Language
 
 ## Overview
 
@@ -62,61 +62,73 @@ the STDIN, by prepending `-` to the command
 (e.g.: `echo "12" | ririsu - eval "hi~hi~ +"`) 
 
 
-# Getting Started
+# A Tour of Ririsu
 
 ## Warming up
 
-So, now that you have a REPL we can try running some code. First, Ririsu is a
-concatenative language, this means that everything works on top of a
-stack. Some commands will push data on the stack, and some will use the top
-values of the stack to do computation, and push the result back on the stack.
+Now that you have a REPL, we can try interacting with some code. Ririsu is a
+concatenative, stack-based language. This means that everything works on top of
+a stack, where everything is basically a function taking a stack and returning
+a new stack. Functions are represented by single ASCII characters. Everything
+is a function, including numbers and what not.
 
-For example, addition would work like this:
+When Ririsu doesn't understand a command, it takes it to mean a function that
+takes in a stack, and returns a new stack with the command at the top of
+it. That is, if we have an empty stack `[]`, and evaluate the command `M`,
+which is not understood by Ririsu, we get the new `["M"]` stack.
 
 ```bash
-ririsu> [1]i[2]i+
+ririsu> 
+[]
+ririsu> M
+"M"
+```
+
+There are a few unary, binary and n-ary operations built-in in Ririsu, which
+provide means of manipulating the stack, code lists and values on the
+stack. For example, the `+` operation is provided for addition, and the `i`
+operation to convert a list to an integer.
+
+```bash
+ririsu> [1]i
+[1]
+ririsu> [2]i
+[2, 1]
+ririsu> +
 [3]
 ```
 
-Where the previous operation is evaluated as follows:
-
-```text
-We start with an empty stack: []
-"1" gets converted to an integer and pushed on the stack: [1]
-"2" gets converted to an integer and pushed on the stack: [2, 1]
-"+" operates on the top two values, and pushes the result back: 2 + 1 => [3]
-```
-
-> **Note:** Ririsu is untyped, so you can shoot yourself in the foot without realising you're shooting yourself in the foot, yay!
+> **Note:** Ririsu is untyped, so you can shoot yourself in the foot without
+> realising you're shooting yourself in the foot, yay!
 
 
-## Down the rabbit hole
+## Higher-Order Functions
 
 Okay, if you ever heard about
 [RPN](http://en.wikipedia.org/wiki/Reverse_Polish_notation) that was no
 biggie. So let's get to the interesting stuff. In Ririsu you can use code as
 data, and data as code. The stack is always what you use to pass arguments to
-functions, and these arguments can be code (yes, yes, Higher-Order functions
-and all that).
+functions, and these arguments can be code too!
 
-To treat code as data, you have to "Quote" it, so that it won't be executed
-just yet:
+To treat code as data, you have to "Quote" it, so that it gets pushed onto the
+stack as a list of commands rather than applied to the current stack. 
 
 ```text
 ririsu> [[1]i[2]i+]
 [["[1]i[2]i+"]]
 ```
 
-We can execute any list using the operation `$`:
+At any moment we can apply a list to the rest of the stack using the `$`
+operation.
 
 ```text
 ririsu> $
 [3]
 ```
 
-Now things start getting interesting, since you can pass code around, and you
-can evaluate it, it means we can do Higher-Order functions! Some of them are
-already core-coded for your convenience, like Map:
+And since you can pass code around and apply it to the stack, you can do
+higher-order functions! Some of them, like Map, are already provided in the
+standard library for your convenience.
 
 ```text
 ririsu> [123456]
@@ -125,7 +137,8 @@ ririsu> [li1+]|
 [["234567"], [3]]
 ```
 
-## Manipulate the stack, they said. It'll be fun, they said...
+
+## Dynamic Scoping
 
 Sometimes you'll need to manipulate the stack so that the operation you're
 applying gets arguments in the correct order. Operations are really just
@@ -133,7 +146,7 @@ functions that take in a Stack and return a new Stack — in Ririsu, though, you
 also get **dynamic scoping**, since functions also take an environment.
 
 Suppose you want to check if the square root of a value is an exact number. You
-could do it by cloning items on the stack:
+could do it by cloning items on the stack.
 
 ```text
 ririsu> [5]is
@@ -146,7 +159,7 @@ ririsu> =
 [false]
 ```
 
-Or you can use the dynamic scoping madness:
+Or you can use the dynamic scoping madness, by way of the `@` operation.
 
 ```text
 ririsu> [[5]is]A@
