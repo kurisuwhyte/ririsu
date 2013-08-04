@@ -11,19 +11,19 @@ Ririsu is a small concatenative esoteric language that's perfect for
 
 ## Examples
 
-### Sum all numbers of a sequence
+### Sum of numbers in a list
 
 ```text
 [123456789][li]|[+].
 ```
 
-### Return all even numbers from a sequence
+### Even numbers in a list
 
 ```text
 [123456789][li]|[[2]i~%[0]i=]#
 ```
 
-### Solving the [100 Doors problem][]
+### Solve the [100 Doors problem][]
 
 ```text
 [e]h[^[f]~[[1]i~-]~[2]i>!?],r[s^o=]|
