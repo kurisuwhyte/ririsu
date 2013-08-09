@@ -19,8 +19,11 @@ A program to sum all numbers of a sequence:
 ## Running
 
     $ git clone git://github.com/kurisuwhyte/ririsu
-    $ cd ririsu && make
+    $ cd ririsu
+    $ mix escriptize
     $ ./bin/ririsu repl
+
+(Or alternatively download the binary)
 
 
 ## Documentation

@@ -1,2 +1,4 @@
 syntax: glob
 *.beam
+ebin
+bin
