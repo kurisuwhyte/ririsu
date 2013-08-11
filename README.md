@@ -9,11 +9,11 @@ data-processing esolang.
 
 A program to return all even numbers of a sequence:
 
-    [123456789][li]|[[2]i~%[0]i=]#
+    [123456789][∘i]→[[2]i⇄%[0]i=]⋈
     
 A program to sum all numbers of a sequence:
 
-    [123456789][li]|[+].
+    [123456789][∘i]→[0]i[+]⚺
 
 
 ## Running
@@ -25,7 +25,7 @@ A program to sum all numbers of a sequence:
     $ mix escriptize
     $ ./bin/ririsu repl
 
-(Or alternatively [download the binary](https://github.com/kurisuwhyte/ririsu/releases/download/0.4.0/ririsu))
+(Or alternatively [download the binary](https://github.com/kurisuwhyte/ririsu/releases/download/0.4.1/ririsu))
 
 
 ## Documentation
