@@ -18,6 +18,8 @@ A program to sum all numbers of a sequence:
 
 ## Running
 
+> You'll need Erlang and Elixir correctly set-up in order to run Ririsu.
+
     $ git clone git://github.com/kurisuwhyte/ririsu
     $ cd ririsu
     $ mix escriptize
