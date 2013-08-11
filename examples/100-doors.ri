@@ -1,11 +1,2 @@
-[-
-   Define the range function as `p`
-   
-   p :: [A | Stack] → [[B] | Stack]
--] 
-[[1]i+[^[f]~[[1]i~-]~[2]i>!?],r]p@
-
-[-
-  Returns a list with the state of the doors.
--] 
-[100]ip[s^o=]|
+[: Returns a list with the state of the doors. ]↓
+[100]iι[√↠⎨=]→

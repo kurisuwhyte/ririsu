@@ -1,13 +1,13 @@
 [No more bottles of beer on the wall, no more bottles of beer.
- Go to the store and buy some more, 99 bottles of beer on the wall.]
+ Go to the store and buy some more, 99 bottles of beer on the wall.]∘
 
 [1 bottle of beer on the wall, 1 bottle of beer.
- Take one down and pass it around, no more bottles of beer on the wall.]
+ Take one down and pass it around, no more bottles of beer on the wall.]∘⊕
 
-[- Generates a range from 99~2 -] 
-[100]i[^[f]~[[1]i~-]~[3]i>!?],
-[alN@
-[ bottles of beer on the wall, ]N&
-[ bottles of beer. Take one down and pass it around, ]N&~&
-[ bottles of beer on the wall.]Ni[1]i~-a&~&
-]|
+[- Generates a range from 99~2 -]↓
+[98]iι[[1]i+]→≪
+[a∘N@
+[ bottles of beer on the wall, ]N⊕
+[ bottles of beer. Take one down and pass it around, ]N⊕⇄⊕
+[ bottles of beer on the wall.]Ni[1]i⇄-a⊕⇄⊕
+]→⊕
