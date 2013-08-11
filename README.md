@@ -23,7 +23,7 @@ A program to sum all numbers of a sequence:
     $ mix escriptize
     $ ./bin/ririsu repl
 
-(Or alternatively download the binary)
+(Or alternatively [download the binary](https://github.com/kurisuwhyte/ririsu/releases/download/0.4.0/ririsu))
 
 
 ## Documentation
