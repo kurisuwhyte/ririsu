@@ -3,7 +3,7 @@ defmodule Ririsu.Mixfile do
 
   def project do
     [ app: :ririsu,
-      version: "0.4.0",
+      version: "0.4.1",
       elixir: "~> 0.10.1",
       deps: deps,
 

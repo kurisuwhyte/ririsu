@@ -25,13 +25,18 @@ defmodule Ririsu.Repl do
 
   def run, do: run({0, :dict.new, []})
   def run(state) do
+    IO.puts "Ririru #{Ririsu.version}    (^D to exit)"
+    evalInputWith(state)
+  end
+
+  def evalInputWith(state) do
     case IO.gets("ririsu> ") do
       :eof        -> System.halt(0)
       {:error, _} -> System.halt(1)
       expr ->
         {mode, env, stack} = Interpreter.run(String.to_char_list!(expr), state)
         IO.inspect stack
-        run({mode, env, stack})
+        evalInputWith({mode, env, stack})
     end
   end
   

@@ -222,12 +222,6 @@ defmodule Ririsu.Interpreter do
 
 
   # -- Lists -----------------------------------------------------------
-
-  @doc "reverse (≪)             [[A] _] → [[A] _]"
-  def op(?≪, {0, env, [xs | stack]}) do
-    {0, env, [:lists.reverse(xs) | stack]}
-  end
-
   @doc "flatten (⇲)             [[[A]] _] → [[A] _]"
   def op(?⇲, {0, env, [xs | stack]}) do
     {0, env, [List.flatten(xs) | stack]}
