@@ -1,0 +1,32 @@
+[-- Logical ----------------------------------------------------------]↓
+[: true → true :]↓
+[⊥¬]!@
+
+[: inequality A B → C ]↓
+[=¬]≠@
+
+[: and A B → C :]↓
+[∘A@∘B@[⊥][[⊥][!]A!=⌥]B!=⌥]∧@
+
+[: or A B → C :]↓
+[∘A@∘B@[⊥][[⊥][!]A⊥=⌥]B⊥=⌥]∨@
+
+[: greater-or-equal-to A B → C :]↓
+[∘A@∘B@AB>AB=∨]≥@
+
+[: less-than A B → C :]↓
+[≥¬]<@
+
+[: less-or-equal-to A B → C :]↓
+[∘A@∘B@AB<AB=∨]≤@
+
+
+[-- Sequences --------------------------------------------------------]↓
+[: reverse [A] → [A] :]↓
+[[][∘⇄⊕]⚺]≪@
+
+[: range Size → [Number]
+
+   Constructs a range from 1~Size.
+]↓
+[[1]i+[↠[⊥]⇄[[1]i⇄-]⇄[2]i>¬⌥]⚻≪]ι@
