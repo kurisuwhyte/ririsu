@@ -14,20 +14,26 @@ Ririsu is a small concatenative esoteric language that's perfect for
 ### Sum of numbers in a list
 
 ```text
-[123456789][li]|[+].
+[∘i]→[0]i[+]⚺
 ```
+
+Run as: `echo 1 2 3 4 5 6 7 8 9 | ririsu - sum.ri`
 
 ### Even numbers in a list
 
 ```text
-[123456789][li]|[[2]i~%[0]i=]#
+[∘i]→[[2]i⇄%[0]i=]⋈
 ```
+
+Run as: `echo 1 2 3 4 5 6 7 8 9 | ririsu - even.ri`
 
 ### Solve the [100 Doors problem][]
 
 ```text
-[e]h[^[f]~[[1]i~-]~[2]i>!?],r[s^o=]|
+[100]iι[√↠⎨=]→
 ```
+
+Run as: `ririsu modules/prelude.ri 100-doors.ri`
 
 [100 Doors problem]: http://rosettacode.org/wiki/100_doors
 
@@ -36,20 +42,21 @@ Ririsu is a small concatenative esoteric language that's perfect for
 
   - Higher-Order and First-Class functions;
   - Dynamic scoping;
-  - Purity (within a Map/Fold);
+  - Purity;
   - Untyped to the core;
   - No I/O;
 
 
 ## Installing
 
-Ririsu is implemented in [Erlang](http://www.erlang.org/), so you'll need that
-to run anything. Once you've got that sorted out, just clone the repository:
+Ririsu is implemented in [Elixir](http://www.elixir-lang.org/), so you'll need
+that to run anything. Once you've got that sorted out, just clone the
+repository:
 
 ```bash
 $ git clone git://github.com/kurisuwhyte/ririsu
 $ cd ririsu
-$ make
+$ mix escriptize
 ```
 
 ## Running
@@ -59,7 +66,7 @@ Use `ririsu repl` to get a Read-Eval-Print-Loop.
 You can evaluate code by running `ririsu <filename>` or 
 `ririsu eval <string>`. You can also initialise the stack with the contents of
 the STDIN, by prepending `-` to the command 
-(e.g.: `echo "12" | ririsu - eval "hi~hi~ +"`) 
+(e.g.: `echo "12" | ririsu - eval "hi⇄hi⇄↓+"`) 
 
 
 # A Tour of Ririsu
@@ -69,7 +76,7 @@ the STDIN, by prepending `-` to the command
 Now that you have a REPL, we can try interacting with some code. Ririsu is a
 concatenative, stack-based language. This means that everything works on top of
 a stack, where everything is basically a function taking a stack and returning
-a new stack. Functions are represented by single ASCII characters. Everything
+a new stack. Functions are represented by single unicode characters. Everything
 is a function, including numbers and what not.
 
 When Ririsu doesn't understand a command, it takes it to mean a function that
@@ -118,11 +125,11 @@ ririsu> [[1]i[2]i+]
 [["[1]i[2]i+"]]
 ```
 
-At any moment we can apply a list to the rest of the stack using the `$`
+At any moment we can apply a list to the rest of the stack using the `▶`
 operation.
 
 ```text
-ririsu> $
+ririsu> ▶
 [3]
 ```
 
@@ -133,7 +140,7 @@ standard library for your convenience.
 ```text
 ririsu> [123456]
 [["123456"], [3]]
-ririsu> [li1+]|
+ririsu> [∘i[1]i+]→
 [["234567"], [3]]
 ```
 
@@ -149,11 +156,11 @@ Suppose you want to check if the square root of a value is an exact number. You
 could do it by cloning items on the stack.
 
 ```text
-ririsu> [5]is
+ririsu> [5]i√
 [2.23606797749979]
-ririsu> ^
+ririsu> ↠
 [2.23606797749979,2.23606797749979]
-ririsu> o
+ririsu> ⎨
 [2,2.23606797749979]
 ririsu> =
 [false]
@@ -162,13 +169,11 @@ ririsu> =
 Or you can use the dynamic scoping madness, by way of the `@` operation.
 
 ```text
-ririsu> [[5]is]A@
+ririsu> [[5]i√]A@
 []  # just stored `square-root(5)` in `A`
-ririsu> AAo=
+ririsu> AA⎨=
 [false]
 ```
-
-> **Note:** Sadly, Erlang doesn't support unicode :(
 
 
 ## What else?
@@ -183,6 +188,7 @@ amazing place to learn more about concatenative programming in general :)
 
 ## Inspirations
 
+  - APL
   - [Brainfuck](http://esolangs.org/wiki/Brainfuck);
   - [Burlesque](http://mroman.ch/burlesque/);
   - [Factor](http://factorcode.org/);
@@ -200,6 +206,10 @@ gotta check that out ;)
 
 
 ## Changelog
+
+#### 0.4.0 — 12th August, 2013
+
+Full rewrite in Elixir with Unicode support.
 
 #### 0.3.0 — 29th August, 2013
 
