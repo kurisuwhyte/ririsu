@@ -25,7 +25,7 @@ defmodule Ririsu.Interpreter do
   @moduledoc """
   The evaluator for the Ririsu language.
   """
-  
+
   @doc """
   Runs a Ririsu source code.
 
@@ -110,7 +110,7 @@ defmodule Ririsu.Interpreter do
 
   @doc "concatenate (⊕)         [[A] [B] _] → [[A B] _]"
   def op(?⊕, {0, env, [a, b | stack]}) do
-    {0, env, [List.concat(a, b) | stack]}
+    {0, env, [Enum.concat(a, b) | stack]}
   end
 
   @doc "cons (×)                [A [B] _] → [[A B] _]"
