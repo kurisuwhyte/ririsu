@@ -4,18 +4,19 @@ defmodule Ririsu.Mixfile do
   def project do
     [ app: :ririsu,
       version: "0.4.1",
-      elixir: "~> 0.10.1",
+      elixir: "~> 0.12.0",
       deps: deps,
 
       escript_app: nil,
-      escript_path: "bin/ririsu"
-      ]
+      escript_path: "bin/ririsu",
+      escript_main_module: Ririsu
+    ]
   end
 
   def application do
     []
   end
-  
+
   defp deps do
     []
   end
